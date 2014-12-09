@@ -84,7 +84,7 @@ $languages = $CI->polyglot->nativelanguages($this->config->item('languages'));?>
     <label for="login"><?php echo lang('session_login_field_login');?></label>
     <input type="text" name="login" id="login" value="<?php echo set_value('login'); ?>" autofocus required /><br />
     <label for="password"><?php echo lang('session_login_field_password');?></label>
-    <input type="password" name="password" id="password" required /><br />
+    <input type="password" name="password" id="password" /><br />
     <br />
     <button id="send" class="btn btn-primary"><?php echo lang('session_login_button_login');?></button><br />
     <br />
