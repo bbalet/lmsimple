@@ -12,6 +12,7 @@ The objective of this project is to provide training materials for the NGO Passe
 * Export to Excel in a click.
 * Calendars of leaves (team).
 * Available in English and French.
+* Simplified REST API (display leave list and detail) with .Net client.
 
 ## Credits
 
