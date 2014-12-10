@@ -110,6 +110,10 @@ $route['session/logout'] = 'session/logout';
 $route['session/language'] = 'session/language';
 $route['session/forgetpassword'] = 'session/forgetpassword';
 
+//REST API
+$route['api/leaves/(:num)'] = 'api/getLeaveById/$1';
+$route['api/leaves'] = 'api/getLeaves';
+
 $route['default_controller'] = 'leaves';
 $route['(:any)'] = 'pages/view/$1';
 

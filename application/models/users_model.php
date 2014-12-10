@@ -262,8 +262,8 @@ class Users_model extends CI_Model {
     
     /**
      * Check the provided credentials
-     * @param type $login user login
-     * @param type $password password
+     * @param string $login user login
+     * @param string $password password
      * @return bool true if the user is succesfully authenticated, false otherwise
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
@@ -316,6 +316,35 @@ class Users_model extends CI_Model {
             } else {
                 // Password does not match stored password.
                 return false;
+            }
+        }
+    }
+    
+    /**
+     * Check the provided credentials for a REST Call
+     * @param string $login user login
+     * @param string $password password
+     * @return int useridentifier if succesfully authenticated, -1 otherwise
+     * @author Benjamin BALET <benjamin.balet@gmail.com>
+     */
+    public function check_authentication($login, $password) {
+        //Load password hasher for create/update functions
+        $this->load->library('bcrypt');
+        $this->db->from('users');
+        $this->db->where('login', $login);
+        $query = $this->db->get();
+
+        if ($query->num_rows() == 0) {
+            //No match found
+            return false;
+        } else {
+            $row = $query->row();
+            if ($this->bcrypt->check_password($password, $row->password)) {
+                // Password does match stored password.
+                return $row->id;
+            } else {
+                // Password does not match stored password.
+                return -1;
             }
         }
     }

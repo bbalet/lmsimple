@@ -383,17 +383,6 @@ class Leaves extends CI_Controller {
     /**
      * Ajax endpoint : Send a list of fullcalendar events
      */
-    public function individual() {
-        $this->expires_now();
-        header("Content-Type: application/json");
-        $start = $this->input->get('start', TRUE);
-        $end = $this->input->get('end', TRUE);
-        echo $this->leaves_model->individual($this->session->userdata('id'), $start, $end);
-    }
-
-    /**
-     * Ajax endpoint : Send a list of fullcalendar events
-     */
     public function workmates() {
         $this->expires_now();
         header("Content-Type: application/json");
