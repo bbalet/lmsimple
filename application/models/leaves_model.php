@@ -43,11 +43,10 @@ class Leaves_model extends CI_Model {
     /**
      * Get the the list of leaves requested for a given employee
      * @param int $id ID of the employee
-     * @param bool $sum_extra true = sum the overtime credits
      * @return array list of records
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function get_user_leaves($id, $sum_extra = FALSE) {
+    public function get_user_leaves($id) {
         $query = $this->db->get_where('leaves', array('employee' => $id));
         return $query->result_array();
     }
@@ -70,40 +69,12 @@ class Leaves_model extends CI_Model {
     }
     
     /**
-     * Try to calculate the lenght of a leave using the start and and date of the leave
-     * and the non working days defined on a contract
-     * @param int $employee
-     * @param date $start
-     * @param date $end
-     * @return float length of leave
-     */
-    public function length($employee, $start, $end) {
-        $this->db->select('sum(CASE `type` WHEN 1 THEN 1 WHEN 2 THEN 0.5 WHEN 3 THEN 0.5 END) as days');
-        $this->db->from('users');
-        $this->db->join('dayoffs', 'users.contract = dayoffs.contract');
-        $this->db->where('users.id', $employee);
-        $this->db->where('date >=', $start);
-        $this->db->where('date <=', $end);
-        $result = $this->db->get()->result_array();
-        $startTimeStamp = strtotime($start." UTC");
-        $endTimeStamp = strtotime($end." UTC");
-        $timeDiff = abs($endTimeStamp - $startTimeStamp);
-        $numberDays = $timeDiff / 86400;  // 86400 seconds in one day
-        if (count($result) != 0) { //Test if some non working days are defined on a contract
-            return $numberDays - $result[0]['days'];
-        } else {
-            return $numberDays;
-        }
-    }
-    
-    /**
      * Get the the list of entitled and taken leaves of a given employee
      * @param int $id ID of the employee
-     * @param bool $sum_extra TRUE: sum compensate summary
      * @return array computed aggregated taken/entitled leaves
      * @author Benjamin BALET <benjamin.balet@gmail.com>
      */
-    public function get_user_leaves_summary($id, $sum_extra = FALSE) {
+    public function get_user_leaves_summary($id) {
         //Compute the current leave period and check if the user has a contract
         //Fill a list of all existing leave types
         $this->load->model('types_model');
@@ -118,7 +89,7 @@ class Leaves_model extends CI_Model {
         $this->db->group_by("leaves.type");
         $taken_days = $this->db->get()->result_array();
         foreach ($taken_days as $taken) {
-            $summary[$taken['type']][0] = $taken['taken']; //Taken
+            $summary[$taken['type']] = $taken['taken']; //Taken
         }
 
         //Remove all lines having taken and entitled set to set to 0
@@ -128,18 +99,6 @@ class Leaves_model extends CI_Model {
             }
         }
         return $summary;     
-    }
-    
-    /**
-     * Get the number of days a user can take for a given leave type
-     * @param int $id employee id
-     * @param int $type type of leave
-     * @return int number of days not taken
-     */
-    public function get_user_leaves_credit($id, $type) {
-        $summary = $this->get_user_leaves_summary($id);
-        //return entitled days - taken (for a given leave type)
-        return ($summary[$type][1] - $summary[$type][0]);
     }
     
     /**
@@ -219,60 +178,7 @@ class Leaves_model extends CI_Model {
     public function delete_leave($id) {
         return $this->db->delete('leaves', array('id' => $id));
     }
-    
-    /**
-     * All leave request of the user
-     * @param int $user_id connected user
-     * @param string $start Unix timestamp / Start date displayed on calendar
-     * @param string $end Unix timestamp / End date displayed on calendar
-     * @return string JSON encoded list of full calendar events
-     * @author Benjamin BALET <benjamin.balet@gmail.com>
-     */
-    public function individual($user_id, $start = "", $end = "") {
-        $this->db->select('leaves.*, types.name as type');
-        $this->db->join('types', 'leaves.type = types.id');
-        $this->db->where('employee', $user_id);
-        $this->db->where('( (leaves.startdate <= DATE(\'' . $start . '\') AND leaves.enddate >= DATE(\'' . $start . '\'))' .
-                                  ' OR (leaves.startdate >= DATE(\'' . $start . '\') AND leaves.enddate <= DATE(\'' . $end . '\')) )');
-        $this->db->order_by('startdate', 'desc');
-        $this->db->limit(255);  //Security limit
-        $events = $this->db->get('leaves')->result();
-        
-        $jsonevents = array();
-        foreach ($events as $entry) {
-            
-            if ($entry->startdatetype == "Morning") {
-                $startdate = $entry->startdate . 'T07:00:00';
-            } else {
-                $startdate = $entry->startdate . 'T12:00:00';
-            }
-
-            if ($entry->enddatetype == "Morning") {
-                $enddate = $entry->enddate . 'T12:00:00';
-            } else {
-                $enddate = $entry->enddate . 'T18:00:00';
-            }
-            
-            switch ($entry->status)
-            {
-                case 1: $color = '#999'; break;     // Planned
-                case 2: $color = '#f89406'; break;  // Requested
-                case 3: $color = '#468847'; break;  // Accepted
-                case 4: $color = '#ff0000'; break;  // Rejected
-            }
-            
-            $jsonevents[] = array(
-                'id' => $entry->id,
-                'title' => $entry->type,
-                'start' => $startdate,
-                'color' => $color,
-                'allDay' => false,
-                'end' => $enddate
-            );
-        }
-        return json_encode($jsonevents);
-    }
-
+ 
     /**
      * All users having the same manager
      * @param int $user_id id of the manager
@@ -324,125 +230,6 @@ class Leaves_model extends CI_Model {
         }
         return json_encode($jsonevents);
     }
-
-    /**
-     * All users having the same manager
-     * @param int $user_id id of the manager
-     * @param string $start Unix timestamp / Start date displayed on calendar
-     * @param string $end Unix timestamp / End date displayed on calendar
-     * @return string JSON encoded list of full calendar events
-     * @author Benjamin BALET <benjamin.balet@gmail.com>
-     */
-    public function collaborators($user_id, $start = "", $end = "") {
-        $this->db->join('users', 'users.id = leaves.employee');
-        $this->db->where('users.manager', $user_id);
-        $this->db->where('( (leaves.startdate <= DATE(\'' . $start . '\') AND leaves.enddate >= DATE(\'' . $start . '\'))' .
-                                ' OR (leaves.startdate >= DATE(\'' . $start . '\') AND leaves.enddate <= DATE(\'' . $end . '\')) )');
-        $this->db->order_by('startdate', 'desc');
-        $this->db->limit(255);  //Security limit
-        $events = $this->db->get('leaves')->result();
-        
-        $jsonevents = array();
-        foreach ($events as $entry) {
-            if ($entry->startdatetype == "Morning") {
-                $startdate = $entry->startdate . 'T07:00:00';
-            } else {
-                $startdate = $entry->startdate . 'T12:00:00';
-            }
-
-            if ($entry->enddatetype == "Morning") {
-                $enddate = $entry->enddate . 'T12:00:00';
-            } else {
-                $enddate = $entry->enddate . 'T18:00:00';
-            }
-            
-            switch ($entry->status)
-            {
-                case 1: $color = '#999'; break;     // Planned
-                case 2: $color = '#f89406'; break;  // Requested
-                case 3: $color = '#468847'; break;  // Accepted
-                case 4: $color = '#ff0000'; break;  // Rejected
-            }
-            
-            $jsonevents[] = array(
-                'id' => $entry->id,
-                'title' => $entry->firstname .' ' . $entry->lastname,
-                'start' => $startdate,
-                'color' => $color,
-                'allDay' => false,
-                'end' => $enddate
-            );
-        }
-        return json_encode($jsonevents);
-    }
-    
-    /**
-     * All leave request of the user
-     * @param int $entity_id Entity identifier (the department)
-     * @param string $start Unix timestamp / Start date displayed on calendar
-     * @param string $end Unix timestamp / End date displayed on calendar
-     * @param bool $children Include sub department in the query
-     * @return string JSON encoded list of full calendar events
-     * @author Benjamin BALET <benjamin.balet@gmail.com>
-     */
-    public function department($entity_id, $start = "", $end = "", $children = false) {
-        $this->db->select('users.firstname, users.lastname,  leaves.*, types.name as type');
-        $this->db->from('organization');
-        $this->db->join('users', 'users.organization = organization.id');
-        $this->db->join('leaves', 'leaves.employee  = users.id');
-        $this->db->join('types', 'leaves.type = types.id');
-        $this->db->where('( (leaves.startdate <= DATE(\'' . $start . '\') AND leaves.enddate >= DATE(\'' . $start . '\'))' .
-                                    ' OR (leaves.startdate >= DATE(\'' . $start . '\') AND leaves.enddate <= DATE(\'' . $end . '\')) )');
-        if ($children == true) {
-            $this->load->model('organization_model');
-            $list = $this->organization_model->get_all_children($entity_id);
-            $ids = array();
-            if (count($list) > 0) {
-                $ids = explode(",", $list[0]['id']);
-            }
-            array_push($ids, $entity_id);
-            $this->db->where_in('organization.id', $ids);
-        } else {
-            $this->db->where('organization.id', $entity_id);
-        }
-        $this->db->where('leaves.status != ', 4);       //Exclude rejected requests
-        $this->db->order_by('startdate', 'desc');
-        $this->db->limit(512);  //Security limit
-        $events = $this->db->get()->result();
-        $jsonevents = array();
-        foreach ($events as $entry) {
-            
-            if ($entry->startdatetype == "Morning") {
-                $startdate = $entry->startdate . 'T07:00:00';
-            } else {
-                $startdate = $entry->startdate . 'T12:00:00';
-            }
-
-            if ($entry->enddatetype == "Morning") {
-                $enddate = $entry->enddate . 'T12:00:00';
-            } else {
-                $enddate = $entry->enddate . 'T18:00:00';
-            }
-            
-            switch ($entry->status)
-            {
-                case 1: $color = '#999'; break;     // Planned
-                case 2: $color = '#f89406'; break;  // Requested
-                case 3: $color = '#468847'; break;  // Accepted
-                case 4: $color = '#ff0000'; break;  // Rejected
-            }
-            
-            $jsonevents[] = array(
-                'id' => $entry->id,
-                'title' => $entry->firstname .' ' . $entry->lastname,
-                'start' => $startdate,
-                'color' => $color,
-                'allDay' => false,
-                'end' => $enddate
-            );
-        }
-        return json_encode($jsonevents);
-    }    
     
     /**
      * List all leave requests submitted to the connected user or only those

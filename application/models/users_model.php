@@ -420,43 +420,6 @@ class Users_model extends CI_Model {
     }
     
     /**
-     * Get the list of employees or one employee
-     * @param int $id optional id of the entity, all entities if 0
-     * @param bool $children true : include sub entities, false otherwise
-     * @return array record of users
-     * @author Benjamin BALET <benjamin.balet@gmail.com>
-     */
-    public function employeesEntity($id = 0, $children = TRUE) {
-        $entities = null;
-        $this->db->select('users.id as id,'
-                . ' users.firstname as firstname,'
-                . ' users.lastname as lastname,'
-                . ' users.email as email,'
-                . ' CONCAT_WS(\' \',managers.firstname,  managers.lastname) as manager_name', FALSE);
-        $this->db->from('users');
-        $this->db->join('users as managers', 'managers.id = users.manager', 'left outer');
-
-        if ($id != 0) {
-            $this->db->join('organization', 'organization.id = users.organization');
-            if ($children == true) {
-                $this->load->model('organization_model');
-                $list = $this->organization_model->get_all_children($id);
-                $ids = array();
-                if (count($list) > 0) {
-                    if ($list[0]['id'] != '') {
-                        $ids = explode(",", $list[0]['id']);
-                    }
-                }
-                array_push($ids, $id);
-                $this->db->where_in('organization.id', $ids);
-            } else {
-                $this->db->where('organization.id', $id);
-            }
-        }
-        return $this->db->get()->result();
-    }
-    
-    /**
      * Update a given employee in the database with the manager ID. 
      * @return type
      * @author Benjamin BALET <benjamin.balet@gmail.com>

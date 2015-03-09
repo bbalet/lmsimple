@@ -111,12 +111,11 @@ $route['session/language'] = 'session/language';
 $route['session/forgetpassword'] = 'session/forgetpassword';
 
 //REST API
-$route['api/leaves/(:num)'] = 'api/getLeaveById/$1';
 $route['api/leaves'] = 'api/getLeaves';
+$route['api/leaves/(:num)'] = 'api/getLeaveById/$1';
+$route['api/balance'] = 'api/getLeaveBalance';
 
 $route['default_controller'] = 'leaves';
-$route['(:any)'] = 'pages/view/$1';
-
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

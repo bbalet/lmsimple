@@ -151,7 +151,22 @@ class Hr extends CI_Controller {
             redirect('hr/employees');
         }
     }
-        
+
+    /**
+     * Get/Set Yearly periods
+     * @author Benjamin BALET <benjamin.balet@gmail.com>
+     */
+    public function yearlyperiod() {
+        //$this->auth->check_is_granted('yearly_period');
+        $data = $this->getUserContext();
+        $this->expires_now();
+        $data['title'] = lang('hr_summary_title');
+        $this->load->view('templates/header', $data);
+        $this->load->view('menu/index', $data);
+        $this->load->view('hr/yearlyperiod', $data);
+        $this->load->view('templates/footer');
+    }
+    
     /**
      * Action: export the list of all leaves into an Excel file
      * @param int $id employee id

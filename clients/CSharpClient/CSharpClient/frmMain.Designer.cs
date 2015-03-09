@@ -34,14 +34,14 @@
             this.txtLogin = new System.Windows.Forms.TextBox();
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.tblLeaves = new System.Windows.Forms.DataGridView();
-            this.label3 = new System.Windows.Forms.Label();
-            this.txtBaseURL = new System.Windows.Forms.TextBox();
             this.Id = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Status = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.StartDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EndDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Duration = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Type = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtBaseURL = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.tblLeaves)).BeginInit();
             this.SuspendLayout();
@@ -109,23 +109,6 @@
             this.tblLeaves.TabIndex = 5;
             this.tblLeaves.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.tblLeaves_CellDoubleClick);
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(19, 8);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(56, 13);
-            this.label3.TabIndex = 6;
-            this.label3.Text = "Base URL";
-            // 
-            // txtBaseURL
-            // 
-            this.txtBaseURL.Location = new System.Drawing.Point(103, 1);
-            this.txtBaseURL.Name = "txtBaseURL";
-            this.txtBaseURL.Size = new System.Drawing.Size(363, 20);
-            this.txtBaseURL.TabIndex = 7;
-            this.txtBaseURL.Text = "http://localhost/lmsimple/api/";
-            // 
             // Id
             // 
             this.Id.HeaderText = "Id";
@@ -156,6 +139,23 @@
             this.Type.HeaderText = "Type";
             this.Type.Name = "Type";
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(19, 8);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(56, 13);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "Base URL";
+            // 
+            // txtBaseURL
+            // 
+            this.txtBaseURL.Location = new System.Drawing.Point(103, 1);
+            this.txtBaseURL.Name = "txtBaseURL";
+            this.txtBaseURL.Size = new System.Drawing.Size(363, 20);
+            this.txtBaseURL.TabIndex = 7;
+            this.txtBaseURL.Text = "http://localhost/lmsimple/api/";
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -180,7 +180,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cmdGetLeaves);
             this.Name = "frmMain";
-            this.Text = "Form1";
+            this.Text = "LMSimple .net client";
             ((System.ComponentModel.ISupportInitialize)(this.tblLeaves)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

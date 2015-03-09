@@ -12,7 +12,7 @@ namespace CSharpClient
         public frmLeaveView(LeaveDB p_objLeave)
         {
             InitializeComponent();
-            txtID.Text = p_objLeave.ToString();
+            txtID.Text = p_objLeave.Id.ToString();
             txtReason.Text = p_objLeave.Cause;
         }
 

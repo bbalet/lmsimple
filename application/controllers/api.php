@@ -84,6 +84,40 @@ class Api extends CI_Controller {
     }
     
     /**
+     * REST End Point : Display the leave balance of an employee
+     * @author Benjamin BALET <benjamin.balet@gmail.com>
+     */
+    public function getLeaveBalance() {
+        //Check if input parameters are set
+        if ($this->input->get_post('login') && $this->input->get_post('password')) {
+            //Check user credentials
+            $login = $this->input->get_post('login');
+            $password = $this->input->get_post('password');
+            $this->load->model('users_model');
+            $user_id = $this->users_model->check_authentication($login, $password);
+            if ($user_id != -1) {
+                $this->load->model('leaves_model');
+                $this->expires_now();
+                header("Content-Type: application/json");
+                $balance = $this->leaves_model->get_user_leaves_summary($user_id);
+                $balanceList = array();
+                foreach ($balance as $key => $value) {
+                    $obj = new stdClass;
+                    $obj->LeaveType = $key;
+                    $obj->Taken = $value;
+                    array_push($balanceList, $obj);
+                }
+                
+                echo json_encode($balanceList);
+            } else {    //Wrong inputs
+                $this->output->set_header("HTTP/1.1 422 Unprocessable entity");
+            }
+        } else {    //Unauthorized
+            $this->output->set_header("HTTP/1.1 403 Forbidden");
+        }
+    }
+    
+    /**
      * Internal utility function
      * make sure a resource is reloaded every time
      */

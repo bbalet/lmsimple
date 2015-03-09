@@ -13,3 +13,5 @@ application/temp/*
 !application/temp/index.html
 !application/temp/.htaccess
 !application/temp/README.TXT
+/clients/CSharpClient/CSharpClient/bin/
+/clients/CSharpClient/CSharpClient/obj/

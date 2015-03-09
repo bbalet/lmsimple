@@ -75,16 +75,10 @@ class Session extends CI_Controller {
                 $this->load->view('templates/footer');
             } else {
                 //If the user has a target page (e.g. link in an e-mail), redirect to this destination
-                $parsed_url = parse_url($this->session->userdata('last_page'));
-                if ($parsed_url['path'] == '/lms/index.php') {
-                    $this->session->set_userdata('last_page', '');
-                }
                 if ($this->session->userdata('last_page') != '') {
-                    log_message('debug', '{controllers/session/login} Redirect to last page=' . $this->session->userdata('last_page'));
                     redirect($this->session->userdata('last_page'));
                 } else {
-                    log_message('debug', '{controllers/session/login} Redirect to home page');
-                    redirect(base_url() . 'home');
+                    redirect(base_url());
                 }
             }
         }

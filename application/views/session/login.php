@@ -22,28 +22,6 @@ $CI->load->helper('language');
 $this->lang->load('session', $language);
 $this->lang->load('global', $language);?>
 
-<style>
-    body {
-        background-image:url('<?php echo base_url();?>assets/images/login-background.png');
-        background-repeat: no-repeat;
-    }
-    
-    .vertical-center {
-        min-height: 90%;  /* Fallback for browsers do NOT support vh unit */
-        min-height: 90vh;
-        display: flex;
-        align-items: center;
-      }
-      
-      .form-box {
-        padding: 20px;
-        border: 1px #e4e4e4 solid;
-        border-radius: 4px;
-        box-shadow: 0 0 6px #ccc;
-        background-color: #fff;
-      }
-</style>
-
     <div class="row vertical-center">
         <div class="span3">&nbsp;</div>
         <div class="span6 form-box">

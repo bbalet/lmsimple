@@ -36,14 +36,14 @@ namespace CSharpClient
                    });
                     string l_strResult = System.Text.Encoding.UTF8.GetString(l_objResponse);
                     l_objLeave = JsonConvert.DeserializeObject<LeaveDB>(l_strResult);
+                    frmLeaveView l_objLeaveView = new frmLeaveView(l_objLeave);
+                    l_objLeaveView.ShowDialog();
                 }
                 catch (WebException l_objException)
                 {
                     MessageBox.Show(l_objException.Message);
                 }
             }
-            frmLeaveView l_objLeaveView = new frmLeaveView(l_objLeave);
-            l_objLeaveView.ShowDialog();
         }
 
         /// <summary>

@@ -1,6 +1,4 @@
-**This project is for educational purposes : IT IS NOT SUITABLE FOR PRODUCTION**
-
-**This project contains intentional bugs, please don't declare issues on Github**
+** THIS PROJECT IS NOT SUITABLE FOR PRODUCTION**
 
 The objective of this project is to provide training materials for the NGO Passerelles numériques http://passerellesnumeriques.org/en/
 
